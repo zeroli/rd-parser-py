@@ -305,13 +305,13 @@ class CalcParser(object):
       assert(0)
 
 def calculator_prompt():
-  print('Welcome to the calculator, Press Ctrl+C to exit.')
+  print('Welcome to the calculator with shutting yard algo, Press Ctrl+C to exit.')
   cp = CalcParser()
 
   try:
     while True:
       try:
-        line = raw_input('--> ')
+        line = input('--> ')
         print(cp.calc(line))
       except ParseError as err:
         print('Error:', err)
