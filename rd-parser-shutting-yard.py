@@ -168,7 +168,7 @@ class CalcParser(object):
 
   def _assign_stmt(self):
     """
-    <assign_stmt> : set <id> = <cmp_expr>
+    <assign_stmt> : set <id> = <infix_expr>
     """
     self._match('SET')
     id_name = self._match('IDENTIFIER')
@@ -218,7 +218,7 @@ class CalcParser(object):
       return False
 
     def __repr__(self):
-      return '<{}({})'.format(self.name, self.prec)
+      return '<{}({})>'.format(self.name, self.prec)
 
   _ops = {
     'u-': Op('unary -', operator.neg, 90, unary=True),
@@ -311,7 +311,7 @@ def calculator_prompt():
   try:
     while True:
       try:
-        line = input('--> ')
+        line = raw_input('--> ')
         print(cp.calc(line))
       except ParseError as err:
         print('Error:', err)
