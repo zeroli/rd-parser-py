@@ -14,6 +14,9 @@ class Token(object):
     def __str__(self):
         return '%s(%s) at %s' % (self.type, self.val, self.pos)
 
+    def __repr__(self):
+        return self.__str__()
+
 class LexerError(Exception):
     """
     Lexer error exception
@@ -50,7 +53,7 @@ class Lexer(object):
 
         self.regex = re.compile('|'.join(regex_parts))
         self.re_ws_skip = re.compile('\S')
-        
+
     def input(self, buf):
         """
         Initialize the lexer with a bufer as input.
@@ -97,7 +100,7 @@ class Lexer(object):
 if __name__ == '__main__':
     rules = [
         ('\d+', 'NUMBER'),
-        ('[a-zA-Z_]\w+', 'IDENTIFIER'),
+        ('[a-zA-Z_]\w*', 'IDENTIFIER'),
         ('\+', 'PLUS'),
         ('\-', 'MINUS'),
         ('\*', 'MULTIPLY'),
@@ -113,10 +116,10 @@ if __name__ == '__main__':
         if line is None:
             break
         lx.input(line)
-        
+
         try:
             for tok in lx.tokens():
-                print tok
-        except LexerError, err:
-            print 'LexerError at position', err.pos
+                print(tok)
+        except LexerError as err:
+            print('LexerError at position', err.pos)
 
