@@ -23,35 +23,59 @@ class literal_token:
     def __init__(self, value):
         self.value = int(value)
     def nud(self):
-        return self.value
+        return self
+    def __repr__(self):
+        return '(literal {})'.format(self.value)
 
 class operator_add_token:
     lbp = 10
     def nud(self):
-        return expression(100)
+        self.first = expression(100)
+        self.second = None
+        return self
     def led(self, left):
-        right = expression(self.lbp)
-        return left + right
+        self.first = left
+        self.second = expression(self.lbp)
+        return self 
+    def __repr__(self):
+        if self.second is not None:
+            return '(add {} {})'.format(self.first, self.second)
+        else:
+            return '(+ {})'.format(self.first)
 
 class operator_sub_token:
     lbp = 10
     def nud(self):
-        return -expression(100)
+        self.first = expression(100)
+        self.second = None
+        return self
     def led(self, left):
-        right = expression(self.lbp)
-        return left - right
+        self.first = left
+        self.second = expression(self.lbp)
+        return self
+    def __repr__(self):
+        if self.second is not None:
+            return '(sub {} {})'.format(self.first, self.second)
+        else:
+            return '(- {})'.format(self.first)
 
 class operator_mul_token:
     lbp = 20
     def led(self, left):
-        right = expression(self.lbp)
-        return left * right
+        self.first = left
+        self.second = expression(self.lbp)
+        return self
+    def __repr__(self):
+        return '(mul {} {})'.format(self.first, self.second)
 
 class operator_div_token:
     lbp = 20
     def led(self, left):
-        right = expression(self.lbp)
-        return left / right
+        self.first = left
+        self.second = expression(self.lbp)
+        return self
+    def __repr__(self):
+        return '(div {} {})'.format(self.first, self.second)
 
 class operator_pow_token:
     lbp = 30
@@ -61,7 +85,12 @@ class operator_pow_token:
         # to have higher precedence
         #   ... 3 ** 2 ** 4
         # => ... 3 ** (2 ** 4)
-        return left ** expression(self.lbp-1)
+        self.first = left
+        self.second = expression(self.lbp-1)
+        return self
+    def __repr__(self):
+        return '(pow {} {})'.format(self.first, self.second)
+
 
 class end_token:
     lbp = 0
