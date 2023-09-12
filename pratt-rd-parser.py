@@ -1,14 +1,15 @@
 import sys
 import re
 
-token_pat = re.compile("\s*(?:(\d+)|(.))")
-
 def expression(rbp = 0):
     global token
     t = token
+    # move over this prefix token
+    token = next()
+
+    # prefix operator expression
     left = t.nud()
 
-    token = next()
     # which op left value will bind to:
     # rbp(previous/left) or token.blp(current/right)?
     while rbp < token.lbp:
@@ -26,12 +27,16 @@ class literal_token:
 
 class operator_add_token:
     lbp = 10
+    def nud(self):
+        return expression(100)
     def led(self, left):
         right = expression(self.lbp)
         return left + right
 
 class operator_sub_token:
     lbp = 10
+    def nud(self):
+        return -expression(100)
     def led(self, left):
         right = expression(self.lbp)
         return left - right
@@ -48,8 +53,20 @@ class operator_div_token:
         right = expression(self.lbp)
         return left / right
 
+class operator_pow_token:
+    lbp = 30
+    def led(self, left):
+        # right associative
+        # -1 to make right op with same precedence
+        # to have higher precedence
+        #   ... 3 ** 2 ** 4
+        # => ... 3 ** (2 ** 4)
+        return left ** expression(self.lbp-1)
+
 class end_token:
     lbp = 0
+
+token_pat = re.compile("\s*(?:(\d+)|(\*\**|.))")
 
 def tokenize(program):
     for number, operator in token_pat.findall(program):
@@ -63,6 +80,8 @@ def tokenize(program):
             yield operator_mul_token()
         elif operator == '/':
             yield operator_div_token()
+        elif operator == '**':
+            yield operator_pow_token()
         else:
             raise SyntaxError('Unknown operator')
     yield end_token()
