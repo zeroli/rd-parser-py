@@ -216,13 +216,36 @@ constant("None")
 constant("True")
 constant("False")
 
+# `not in` and `is not`
+@method(symbol("not", 60))
+def led(self, left):
+    if token.id != "in":
+        raise SyntaxError("Invalid syntax")
+    advance()
+    self.id = "not in"
+    self.first = left
+    self.second = expression(60)
+    return self
+
+@method(symbol("is", 60))
+def led(self, left):
+    if token.id == "not":
+        advance()
+        self.id = "is not"
+    self.first = left
+    self.second = expression(60)
+    return self
+
 symbol("lambda", 20)
 symbol("if", 20) # ternary form
 
-infix_r("or", 30); infix_r("and", 40); prefix("not", 50)
+infix_r("or", 30); infix_r("and", 40);
+prefix("not", 50)
 
-infix("in", 60); infix("not", 60) # in, not in
-infix("is", 60) # is, is not
+infix("in", 60);
+#infix("not", 60) # in, not in
+#infix("is", 60) # is, is not
+
 infix("<", 60); infix("<=", 60)
 infix(">", 60); infix(">=", 60)
 infix("<>", 60); infix("!=", 60); infix("==", 60)
