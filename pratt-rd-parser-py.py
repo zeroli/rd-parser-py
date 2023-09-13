@@ -205,6 +205,17 @@ def argument_list(list):
             break
         advance(",")
 
+# constants
+def constant(id):
+    @method(symbol(id))
+    def nud(self):
+        self.id = "(literal)"
+        self.value = id
+        return self
+constant("None")
+constant("True")
+constant("False")
+
 symbol("lambda", 20)
 symbol("if", 20) # ternary form
 
