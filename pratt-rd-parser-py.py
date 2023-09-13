@@ -117,6 +117,30 @@ def infix_r(id, bp):
         return self
     symbol(id, bp).led = led
 
+# group expression parsing
+def nud(self):
+    expr = expression()
+    advance(")")
+    return expr
+symbol("(").nud = nud
+
+def advance(id = None):
+    global token
+    if id and token.id != id:
+        raise SyntaxError("Expected %r" % id)
+    token = next()
+symbol(")")
+
+# ternary operator parsing:
+# `1 if 2 else 3`
+def led(self, left):
+    self.first = left # consequence parsed
+    self.second = expression() # parse `2` above condition
+    advance("else")
+    self.third = expression() # parse `3` above alternative
+    return self
+symbol("if").led = led
+symbol("else")
 
 symbol("lambda", 20)
 symbol("if", 20) # ternary form
