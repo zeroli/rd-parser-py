@@ -164,6 +164,27 @@ def led(self, left):
 symbol("[").led = led
 symbol("]")
 
+def method(s):
+    assert issubclass(s, symbol_base)
+    def bind(fn):
+        setattr(s, fn.__name__, fn)
+    return bind
+
+# function call
+symbol("("); symbol(",")
+@method(symbol("("))
+def led(self, left):
+    self.first = left
+    self.second = []
+    if token.id != ")":
+        while 1:
+            self.second.append(expression())
+            if token.id != ",":
+                break
+            advance(",")
+    advance(")")
+    return self
+
 symbol("lambda", 20)
 symbol("if", 20) # ternary form
 
