@@ -185,6 +185,26 @@ def led(self, left):
     advance(")")
     return self
 
+# lambda
+symbol(":")
+@method(symbol("lambda"))
+def nud(self):
+    self.first = []
+    if token.id != ":":
+        argument_list(self.first)
+    advance(":")
+    self.second = expression()
+    return self
+def argument_list(list):
+    while 1:
+        if token.id != "(name)":
+            raise SyntaxError("Expected an argument name.")
+        list.append(token)
+        advance()
+        if token.id != ",":
+            break
+        advance(",")
+
 symbol("lambda", 20)
 symbol("if", 20) # ternary form
 
