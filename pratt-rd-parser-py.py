@@ -117,6 +117,39 @@ def infix_r(id, bp):
         return self
     symbol(id, bp).led = led
 
+symbol("lambda", 20)
+symbol("if", 20) # ternary form
+
+infix_r("or", 30); infix_r("and", 40);
+prefix("not", 50)
+
+infix("in", 60);
+#infix("not", 60) # in, not in
+#infix("is", 60) # is, is not
+
+infix("<", 60); infix("<=", 60)
+infix(">", 60); infix(">=", 60)
+infix("<>", 60); infix("!=", 60); infix("==", 60)
+
+infix("|", 70); infix("^", 80); infix("&", 90)
+
+infix("<<", 100); infix(">>", 100)
+
+infix("+", 110); infix("-", 110)
+
+infix("*", 120); infix("/", 120); infix("//", 120)
+infix("%", 120)
+
+prefix("-", 130); prefix("+", 130); prefix("~", 130)
+
+infix_r("**", 140)
+
+symbol(".", 150); symbol("[", 150); symbol("(", 150)
+
+symbol("(literal)").nud = lambda self: self
+symbol("(name)").nud = lambda self: self
+symbol("(end)")
+
 # group expression parsing
 def nud(self):
     expr = expression()
@@ -236,38 +269,61 @@ def led(self, left):
     self.second = expression(60)
     return self
 
-symbol("lambda", 20)
-symbol("if", 20) # ternary form
+# tuple: `(...)`
+@method(symbol("("))
+def nud(self):
+    self.first = []
+    comma = False
+    if token.id != ")":
+        while 1:
+            if token.id == ")":
+                break
+            self.first.append(expression())
+            if token.id != ",":
+                break
+            comma = True
+            advance(",")
+    advance(")")
+    if not self.first or comma:
+        return self
+    else:
+        return self.first[0]
 
-infix_r("or", 30); infix_r("and", 40);
-prefix("not", 50)
+# list: `[...]`
+symbol("]")
 
-infix("in", 60);
-#infix("not", 60) # in, not in
-#infix("is", 60) # is, is not
+@method(symbol("["))
+def nud(self):
+    self.first = []
+    if token.id != "]":
+        while 1:
+            if token.id == "]":
+                break
+            self.first.append(expression())
+            if token.id != ",":
+                break
+            advance(",")
+    advance("]")
+    return self
 
-infix("<", 60); infix("<=", 60)
-infix(">", 60); infix(">=", 60)
-infix("<>", 60); infix("!=", 60); infix("==", 60)
+symbol("}"); symbol(":")
 
-infix("|", 70); infix("^", 80); infix("&", 90)
-
-infix("<<", 100); infix(">>", 100)
-
-infix("+", 110); infix("-", 110)
-
-infix("*", 120); infix("/", 120); infix("//", 120)
-infix("%", 120)
-
-prefix("-", 130); prefix("+", 130); prefix("~", 130)
-
-infix_r("**", 140)
-
-symbol(".", 150); symbol("[", 150); symbol("(", 150)
-
-symbol("(literal)").nud = lambda self: self
-symbol("(name)").nud = lambda self: self
-symbol("(end)")
+# dict: `{k : v, ...}`
+@method(symbol("{"))
+def nud(self):
+    self.first = []
+    if token.id != "}":
+        while 1:
+            if token.id == "}":
+                break
+            self.first.append(expression())
+            advance(":")
+            self.first.append(expression())
+            if token.id != ",":
+                break
+            advance(",")
+    advance("}")
+    return self
 
 def parse(program):
     global token, next
