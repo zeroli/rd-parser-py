@@ -142,6 +142,28 @@ def led(self, left):
 symbol("if").led = led
 symbol("else")
 
+# attribute lookup
+# `a.b`
+def led(self, left):
+    global token
+    if token.id != "(name)":
+        raise SyntaxError("Expected an attribute name.")
+    self.first = left
+    self.second = token
+    advance()
+    return self
+symbol(".").led = led
+
+# item access
+# a["x"]
+def led(self, left):
+    self.first = left
+    self.second = expression()
+    advance("]")
+    return self
+symbol("[").led = led
+symbol("]")
+
 symbol("lambda", 20)
 symbol("if", 20) # ternary form
 
